@@ -18,9 +18,9 @@
 
 ### 1.1 Identity and join keys
 
-**Both tables key on `VARCHAR(36)` UUID strings — not integers.** This contradicts the
-older schema doc, which typed `adopter_interactions.dog_profile_id` as `INTEGER`. That
-column must be `VARCHAR(36)` (or `UUID`) in the matching app's schema.
+**Both tables key on `VARCHAR(36)` UUID strings — not integers.** The adopter schema
+has been reconciled accordingly: `adopter_interactions.dog_profile_id` is a
+`VARCHAR(36)` soft reference.
 
 | Table | Column | Type | Nulls | Semantics |
 |---|---|---|---|---|

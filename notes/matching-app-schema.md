@@ -146,7 +146,11 @@ CREATE INDEX ix_interactions_adopter_time ON adopter_interactions (adopter_id, e
 CREATE INDEX ix_interactions_adopter_dog ON adopter_interactions (adopter_id, dog_profile_id);
 ```
 
-**Why soft reference for `dog_profile_id`:** A hard FK would require fetchr and the matching app to share the same Postgres schema or use cross-schema references. Soft reference keeps the repos independently deployable. The matching app must tolerate a dog being deleted from fetchr (soft-deleted) — it should handle nulls gracefully in the join.
+**Why soft reference for `dog_profile_id`:** Although both applications share one
+Postgres database, fetchr exclusively owns `dog_profiles`. A cross-boundary FK would
+couple this app's migrations and lifecycle to a table it cannot control. Validate dog
+existence in application code before appending an interaction, and tolerate a later
+fetchr soft-delete when reading history.
 
 **Event type values:**
 ```
@@ -296,6 +300,8 @@ CREATE INDEX ix_dog_features_breed_group ON dog_features (breed_group);
 
 ## Open Schema Questions
 
-- **Hard vs. soft FK on `adopter_interactions.dog_profile_id`:** Final decision deferred until database sharing strategy is confirmed. If shared DB, make it a hard FK with `ON DELETE SET NULL`. If separate DBs later, soft reference is correct from the start.
+- **Dog-reference validation behavior:** The soft-reference decision is locked.
+  Implementation still needs to define the safe client response when a dog UUID is
+  unknown or no longer available; no cross-boundary database FK will be added.
 - **Geocoding service:** What geocodes `zip_code → lat/lng` at adopter profile creation? Options: Google Maps API, PostGIS built-in, a free batch geocoder. Decide before building the onboarding flow.
 - **`adopter_preferences` update frequency:** Does the inference job run after every interaction or in batches? Batch (e.g., after every 5 interactions) is simpler to start.
