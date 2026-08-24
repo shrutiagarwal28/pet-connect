@@ -1,0 +1,8 @@
+.env
+api/.env
+api/.venv/
+__pycache__/
+.pytest_cache/
+web/.next/
+web/node_modules/
+web/coverage/

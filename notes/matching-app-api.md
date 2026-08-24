@@ -527,20 +527,19 @@ GET    /dogs/{dog_profile_id}                  — full detail page (feeds view_
    strong explicit preference signal, but `search` is not in the decided event-type
    enum, and the enum was a do-not-revisit constraint. Needs an explicit decision to
    extend it.
-6. **What parses the query.** LLM vs. rule-based parser (and if LLM: model, cost,
-   latency budget, and whether `unmatched_terms` come from the model or a validator
-   diff). The contract above is parser-agnostic on purpose.
-7. **Rate limiting.** Both the swipe endpoint (bots) and the search endpoint (if
-   LLM-backed, each call costs real money) need limits; strategy/provider undecided
-   (carried over from June).
-8. **Cursor lifetime/versioning.** Keyset cursors embed ranking keys; a ranking-logic
+6. **Rate limiting for non-LLM endpoints.** The search endpoint's MVP limit is
+   defined in `chatbot-parser-spec.md`; limits for swipe and other endpoints still
+   need a broader API-wide policy.
+7. **Cursor lifetime/versioning.** Keyset cursors embed ranking keys; a ranking-logic
    deploy invalidates in-flight cursors. Silent restart vs. explicit `422` handling is
    a client-contract decision not covered by any doc.
-9. **Geocoder failure follow-up.** `geocoded: false` at onboarding — is there a retry
+8. **Geocoder failure follow-up.** `geocoded: false` at onboarding — is there a retry
    job, and does the client ever need to re-prompt for location? Depends on the
    geocoding-provider decision (ERD open question 2).
 
 > Resolved since first draft (2026-07-20): **idempotency** (required client UUID key,
 > unique on `(adopter_id, idempotency_key)`, duplicate → `202` no-write — see §3) and
 > **breed exclusion in search** (positive selection only; "no pit bulls" is never
-> parsed — see §6).
+> parsed — see §6). Resolved 2026-07-20: **query parser** is an Anthropic API LLM
+> call using structured output into the validated constraint schema; model output
+> supplies `unmatched_terms` (see `chatbot-parser-spec.md`).

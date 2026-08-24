@@ -1,6 +1,6 @@
 # Matching Dimension Contract
 
-> Design doc — 2026-07-12. No code yet.
+> Design doc — 2026-07-12; reconciled 2026-07-20. No code yet.
 > This is the **shared vector space** the matcher operates in: the canonical list of
 > matching dimensions, and the mapping from adopter inputs → those dimensions.
 >
@@ -8,7 +8,7 @@
 > were written (June 2026) against an older `dog_features` schema — `*_ord`/`*_flag` naming and
 > a **multi-hot `trait_*`** personality encoding. Phase 5 replaced multi-hot with **semantic
 > dimension scores** (see the feature-engineering plan). This doc is the reconciliation point;
-> the two older docs need updating to match (tracked in "Stale references to fix" below).
+> the older docs were reconciled on 2026-07-20 (recorded below).
 
 ---
 
@@ -113,13 +113,13 @@ not asked upfront (see the product philosophy in `adopter-profile-matching-desig
 
 ---
 
-## Stale references to fix (follow-up, not now)
+## Reconciliation status (completed 2026-07-20)
 
-- `matching-app-schema.md` "Data Contract with fetchr" table: rename `*_ord`→`*_enc`,
-  `compat_*`→`good_with_*_enc`, `*_flag`→`*_enc`; **remove `trait_*` multi-hot + `other_traits_count`**;
-  add the nine Phase 5 `*_score` columns; drop `is_purebred`/`days_listed` until built.
-- `adopter-profile-matching-design.md` Matching Function step 2: replace "personality trait overlap
-  (multi-hot dot product)" with "dimension-vector similarity over the Phase 5 `*_score` columns."
+- `matching-app-schema.md` now uses the live `*_enc` names, omits the retired
+  `trait_*`/`other_traits_count` representation, reserves the nine Phase-5 score
+  columns, and omits unavailable `is_purebred`/`days_listed` fields.
+- `adopter-profile-matching-design.md` now describes dimension-vector similarity
+  rather than the retired multi-hot trait dot product.
 
 ---
 
@@ -128,7 +128,7 @@ not asked upfront (see the product philosophy in `adopter-profile-matching-desig
 - **Behavioral/product model + schema:** `adopter-profile-matching-design.md` (how preferences are
   learned, pop-up system, cold-start, repo boundary). Still valid *except* the feature-column
   references above.
-- **Adopter-side tables:** `matching-app-schema.md` (needs the column reconciliation above).
+- **Adopter-side tables:** `matching-app-schema.md` (reconciled against the live contract).
 - **Dog-side features:** feature-engineering plan (Phases 0–6) + `data/trait_lexicon.json` (the
   trait→dimension weights, built next).
 - **The handoff:** `dog_features` remains the single interface between fetchr and the matching app.

@@ -1,9 +1,11 @@
-# Plan: Natural-language dog search UI
+# Archived Plan: Natural-language dog search UI
 
-> Status: design approved in principle (Claude-parses + Streamlit). This revision
-> raises it to staff-level: sharper contracts, the personality-matching fix,
-> hybrid filter/rank, an LLM eval harness, error taxonomy, observability, cost
-> controls, and a phased rollout.
+> **Superseded 2026-07-20. Do not implement this plan.** It describes an earlier
+> fetchr-owned Streamlit demo. The adopter product is now a Next.js `/web` app backed
+> by the FastAPI `/api`; chatbot parsing feeds the same matching engine as onboarding.
+> The authoritative contracts are `chatbot-parser-spec.md`, `matching-app-api.md`,
+> `matching-logic.md`, and `matching-dimension-contract.md`. This file is retained
+> only as design history.
 
 ## 1. Context & problem statement
 

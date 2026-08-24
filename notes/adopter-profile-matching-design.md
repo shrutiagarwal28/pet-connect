@@ -144,7 +144,7 @@ preferred_age_source    enum: inferred / explicit
 |---|---|---|
 | 3+ consecutive right-swipes on large dogs | "Looks like you're open to bigger dogs — do you have space for one?" | `max_dog_size` |
 | Consistent left-swipes on senior dogs | "Are you looking for a younger dog specifically?" | `preferred_age_range` |
-| 3+ saves all have `trait_playful` / `trait_athletic` | "How active is your typical day?" (sedentary / moderate / active) | `activity_level` |
+| 3+ saves have strong playfulness / energy signals | "How active is your typical day?" (sedentary / moderate / active) | `activity_level` |
 | First shelter contact | "What stood out about this dog?" (free text) | `free_text_description` → embedding |
 | Right-swipes on 2+ special needs dogs | "Are you open to a dog with special needs?" | `ok_with_special_needs` |
 | Consistent left-swipes on all pit bull types | Do NOT ask — show breed group diversity options in settings instead | breed filtering |
@@ -185,7 +185,7 @@ dismissed             BOOL
 
 ### Stage 2 — Warm Start (~10–20 interactions)
 
-- Content-based matching: "You right-swiped 8 dogs — 7 were medium, 6 had `trait_friendly`, 5 were 1–3 years old → surface more of those"
+- Content-based matching: "You right-swiped 8 dogs — 7 were medium, 6 had strong sociability signals, 5 were 1–3 years old → surface more of those"
 - Implementation: weighted dot product between the adopter's inferred preference vector and each dog's feature vector (from `dog_features` table)
 - Pop-up questions begin firing here to confirm inferred hypotheses
 
@@ -225,7 +225,7 @@ match(adopter, candidate_dogs):
      - size match weight
      - age range match weight
      - breed group match weight
-     - personality trait overlap weight (multi-hot dot product)
+     - dimension-vector similarity over available Phase-5 `*_score` columns
      - activity level ↔ energy trait alignment weight
      - compatibility field alignment (partial credit for unknown, full for known-match)
 
@@ -275,9 +275,11 @@ When implementation begins, the order should be:
 
 ## Repository Boundary: fetchr vs. Matching App
 
-fetchr is the scraping and data pipeline layer only. The matching app is a separate repository. The boundary is clean.
+fetchr is the scraping and data-pipeline repository. This repository contains the
+adopter-facing matching app. Both applications share one Postgres database, while
+table ownership remains strict.
 
-### What fetchr owns (this repository)
+### What fetchr owns (the fetchr repository)
 
 ```
 Scrapers (PetFinder, AdoptaPet, ...)
@@ -293,7 +295,7 @@ dog_features          ← ML-ready feature vector  ◄── THIS IS THE INTERFA
 
 Supporting reference tables: `petfinder_breeds`, `organizations` (planned).
 
-### What the matching app owns (separate repository)
+### What this repository owns
 
 ```
 adopter_profiles
@@ -369,7 +371,8 @@ adopter_question_events   (per-adopter pop-up history)
 
 For each table, decide: columns, types, nullability, indexes, foreign keys. Key questions:
 - Primary key strategy: UUID vs serial? (UUID is safer for a consumer app — no enumerable IDs)
-- Does `adopter_interactions.dog_profile_id` need a hard FK to fetchr's `dog_profiles`, or is it a soft reference since the repos are conceptually separate?
+- `adopter_interactions.dog_profile_id` is a soft reference: validate the dog in
+  application code and never create a cross-boundary FK.
 - What indexes does `adopter_interactions` need? The inference job will read it constantly.
 
 Don't write migrations yet — design the schema as a document first.
@@ -411,15 +414,13 @@ Decide explicitly:
 
 ---
 
-### Step 6 — Choose the Tech Stack
+### Step 6 — Apply the Locked Tech Stack
 
-Only after the product and design decisions are made, pick tools. Those decisions constrain the choices sensibly.
-
-Things to decide:
-- **Language / framework** — Python + FastAPI is natural given fetchr is Python, but make it a conscious decision
-- **Auth** — how do adopters log in? Email/password, Google OAuth? Do not design custom auth; use a library or managed service (e.g. Supabase Auth, Clerk)
-- **Hosting** — local only for now, or deploy from the start?
-- **Migration tooling** — Alembic again (consistent with fetchr) is the default choice
+- `/api`: Python, FastAPI, Pydantic, SQLAlchemy, and Alembic.
+- `/web`: Next.js for onboarding, feed, and chatbot UI.
+- Auth: hardcoded test adopter for the local MVP; managed auth later, never custom.
+- Hosting: local only for now.
+- Database: the shared Postgres instance, respecting table ownership boundaries.
 
 ---
 
@@ -435,12 +436,10 @@ Repo setup takes an afternoon. The design work above is what takes real time —
 
 ---
 
-## Open Questions (Not Yet Resolved)
+## Remaining Open Questions
 
 - **How long does cold start last?** What's the threshold (N interactions) at which we switch from popularity-based to preference-based ranking? Needs experimentation.
 - **Recency weighting.** A right-swipe from 3 months ago should carry less weight than one from yesterday. Decay function TBD.
 - **Adopter-side feedback on matches.** If the adopter is shown a dog and immediately left-swipes, does that feed back into improving the dog's features or just the adopter's preference model?
 - **Multi-household decision making.** Real adopter decisions often involve two people (partners). The profile models one person. Is this a problem at this stage?
 - **Re-engagement.** If an adopter goes dark for 3 months and comes back, do we reset or preserve their preference model? Preferences can drift.
-- **MVP surface decision.** Web app, mobile app, or API-only? Not yet decided.
-- **Database sharing decision.** Shared Postgres with fetchr vs. separate DB? Not yet decided — leaning toward shared for now.
