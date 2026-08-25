@@ -108,17 +108,16 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="hero-art" aria-label="A happy rescue dog ready to meet an adopter">
+          <div className="hero-art">
             <Image
               className="hero-dog-image"
-              src="/images/pet-connect-hero-dog.png"
-              alt="Happy black and tan rescue dog wearing a blue collar"
-              width={1254}
-              height={1254}
+              src="/pet-connect-hero-dog.png"
+              alt="Happy dog ready to meet an adopter"
+              width={1536}
+              height={1024}
               priority
-              sizes="(max-width: 780px) 100vw, 52vw"
+              sizes="(max-width: 768px) 100vw, 52vw"
             />
-            <span className="dot-grid" aria-hidden="true" />
           </div>
         </div>
       </section>

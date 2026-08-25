@@ -142,7 +142,6 @@ h1, h2 {
 }
 
 .hero-dog-image { position: absolute; inset: auto 0 0 auto; width: min(690px, 100%); height: auto; display: block; }
-.dot-grid { position: absolute; top: 45px; right: 10px; width: 88px; height: 88px; opacity: 0.58; background-image: radial-gradient(circle, var(--paper) 3px, transparent 4px); background-size: 20px 20px; }
 
 .confidence-strip { border-bottom: 1px solid var(--line); background: var(--paper); }
 .confidence-row { display: grid; grid-template-columns: repeat(3, 1fr); padding-top: 20px; padding-bottom: 20px; }
@@ -207,8 +206,6 @@ h1, h2 {
     object-fit: contain;
     object-position: right bottom;
   }
-
-  .dot-grid { top: 24px; }
 }
 
 .back-link { display: inline-block; margin-bottom: 28px; color: var(--muted); font-size: 0.9rem; text-decoration: none; }
@@ -319,9 +316,8 @@ h1, h2 {
   .hero-intro { margin-left: 0; font-size: 1rem; }
   .hero-cta { width: 100%; }
   .privacy-note { justify-content: flex-start; font-size: 0.78rem; }
-  .hero-art { min-height: 365px; margin: 0 -18px; width: auto; }
+  .hero-art { min-height: 305px; margin: 0 -18px; width: auto; }
   .hero-dog-image { width: min(450px, 116%); max-width: none; }
-  .dot-grid { display: none; }
   .confidence-row { grid-template-columns: 1fr; padding-top: 10px; padding-bottom: 10px; }
   .confidence-item { justify-content: flex-start; padding: 9px 18px; }
   .confidence-item + .confidence-item { border-top: 1px solid var(--line); border-left: 0; }
