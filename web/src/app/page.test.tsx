@@ -9,6 +9,10 @@ describe("HomePage", () => {
 
     expect(screen.getByRole("heading", { name: "Find your best friend." })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Find your dog" })).toHaveAttribute("href", "/preferences");
+    const heroImage = screen.getByRole("img", { name: "Happy dog ready to meet an adopter" });
+    expect(decodeURIComponent(heroImage.getAttribute("src") ?? "")).toContain(
+      "/pet-connect-hero-dog.png",
+    );
     expect(screen.queryByRole("link", { name: /browse/i })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "A thoughtful match, from the start." })).toBeInTheDocument();
   });
